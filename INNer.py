@@ -1,38 +1,51 @@
 print("""
 Source code can be found on my GitHub: github.com/NLipatov
+This software is released under the MIT license
+
 ver: 1.0
 """)
-
 
 
 import time, os, xlrd, xlwt
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from xlutils.copy import copy
+
+critical_counter = 0
+INNerSettingsFilePath = os.path.dirname(os.path.abspath(__file__)).replace('\\', '\\\\') + '\\\\chromedriver.exe'
 direction = input('Вставьте путь к файлам:')
 workbookname = input('Вставьте название файла:')
 os.chdir(direction)
 workbook = xlrd.open_workbook(workbookname + '.xls')
 sheet = workbook.sheet_by_index(0)
-workbookWT = xlrd.open_workbook( 'Sample.xls', formatting_info=True )
+workbookWT = xlrd.open_workbook( (workbookname + '.xls'), formatting_info=True )
 sheetWT = workbookWT.sheet_by_index(0)
 wb = copy(workbookWT)
 wbsheet = wb.get_sheet(0)
 
 
+
 RFW = 1
 try:
     for i in range (1, sheet.nrows):
+        RFW = i
         nam = sheet.cell_value(i, 2)
         otch = sheet.cell_value(i,3)
         fam = sheet.cell_value(i,4)
         pnum = sheet.cell_value(i, 7) + sheet.cell_value(i, 8)
         bdate = sheet.cell_value(i, 19).replace('-', '')
+        print(i, RFW)
+        if fam == sheet.cell_value(i,4):
+            print('PASSED')
+        if fam != sheet.cell_value(i,4):
+            print('NOT PASSED')
+            critical_counter += 1
 
         options = Options()
         options.add_argument('--headless')
         options.add_argument('--disable-gpu')
-        driver = webdriver.Chrome(r"C:\Users\Admin\PycharmProjects\INN\chromedriver.exe", options=options)
+        options.add_experimental_option( 'excludeSwitches', ['enable-logging'] )
+        driver = webdriver.Chrome(f'{str(INNerSettingsFilePath)}', options=options)
 
         driver.get('https://service.nalog.ru/static/personal-data.html?svc=inn&from=%2Finn.do')
         driver.find_element_by_id("unichk_0").click()
@@ -60,19 +73,20 @@ try:
                 time.sleep(1)
                 if count > 20:
                     print('ИНН не найден. Либо не работает сайт, либо ошибка в данных.\n')
-                    result = ''
+                    wbsheet.write(RFW, 17, '')
                     break
             else:
-                # print(f'Для клиента {fam} {nam} {otch} успешно найден ИНН.')
-                print(f'ИНН: {result[32:69]}')
                 wbsheet.write(RFW, 17, (result[32:69]))
-                wb.save( 'Sample.xls' )
-                RFW += 1
+                print(f'ИНН:{result[32:69]}')
+                wb.save('INNERED — ' + workbookname + '.xls')
                 break
+
 except PermissionError:
     print('Критическая ошибка — Файл нужно закрыть!')
 driver.quit()
 
 print('\n\nРабота завершена, файл обработан.')
+print(f'Ошибок присваивания: {critical_counter}. \n/'
+      f'При наличии хотя бы одной ошибки присваивания, результатом выдачи программы пользоваться нельзя!')
 while True:
     pass
