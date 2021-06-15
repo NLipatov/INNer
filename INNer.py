@@ -13,6 +13,7 @@ from xlutils.copy import copy
 
 critical_counter = 0
 INNerSettingsFilePath = os.path.dirname(os.path.abspath(__file__)).replace('\\', '\\\\') + '\\\\chromedriver.exe'
+print(INNerSettingsFilePath)
 direction = input('Вставьте путь к файлам:')
 workbookname = input('Вставьте название файла:')
 os.chdir(direction)
@@ -36,16 +37,16 @@ try:
         bdate = sheet.cell_value(i, 19).replace('-', '')
         print(i, RFW)
         if fam == sheet.cell_value(i,4):
-            print('PASSED')
+            print(f'PASSED — {fam} / {sheet.cell_value(i,4)}')
         if fam != sheet.cell_value(i,4):
-            print('NOT PASSED')
+            print(f'NOT PASSED — {fam} / {sheet.cell_value(i,4)}')
             critical_counter += 1
 
         options = Options()
         options.add_argument('--headless')
         options.add_argument('--disable-gpu')
         options.add_experimental_option( 'excludeSwitches', ['enable-logging'] )
-        driver = webdriver.Chrome(f'{str(INNerSettingsFilePath)}', options=options)
+        driver = webdriver.Chrome(f'{INNerSettingsFilePath}', options=options)
 
         driver.get('https://service.nalog.ru/static/personal-data.html?svc=inn&from=%2Finn.do')
         driver.find_element_by_id("unichk_0").click()
