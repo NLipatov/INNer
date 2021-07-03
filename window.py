@@ -1,5 +1,5 @@
 import tkinter as tk
-import os, time, inn
+import os, time, inn, no_payment_sms_gui
 import urllib.request
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
@@ -30,7 +30,7 @@ def write_hello():
     global w
     if helloraised == 0:
         helloraised = 1
-        w = tk.Label(window, text = "This software is released under the MIT Licence\nAuthor: Lipatov Nikita\nIcon: upper left by Simphiwe Mangole from the Noun Project")
+        w = tk.Label(window, text = "MIT License\nCopyright (c) 2021 N.Lipatov", width=21)
         w.grid()
     else:
         helloraised == 1
@@ -74,18 +74,18 @@ disclaimerFrame = tk.Frame()
 disclaimer = tk.Label(master=disclaimerFrame, text="""Source code can be found on my GitHub: github.com/NLipatov
 This software is released under the MIT license.
 
-Lead developer: Lipatov Nikita
-Icon author: 'Eucalyp' from www.flaticon.com
-ver: 1.0.1""")
+Lead programmer: Lipatov Nikita""")
 window.rowconfigure([0],minsize=300, weight=1)
 window.columnconfigure([0, 1],minsize=10, weight=1)
 
 buttonFrame = tk.Frame(window, bd= 7, bg='grey')
-buttonOpen = tk.Button(buttonFrame, text='Открыть файл', command=FileSelect)
-buttonHello = tk.Button(buttonFrame, text='Credits', command=write_hello)
+buttonOpen = tk.Button(buttonFrame, text='Открыть файл', command=FileSelect, width=20)
+ButtonSMS_nodata_payed = tk.Button(buttonFrame, text='SMS: нет данных, оплачено', command=no_payment_sms_gui.GUI, width=20)
+buttonAuthors = tk.Button(buttonFrame, text='Авторство', command=write_hello, width=20)
 
 buttonOpen.grid(row=0, column=0, ipadx=23, sticky='w')
-buttonHello.grid(row=1, column=0, ipadx=23, sticky='w')
+buttonAuthors.grid(row=2, column=0, ipadx=23, sticky='s')
+ButtonSMS_nodata_payed.grid(row=1, column=0, ipadx=23, sticky='w')
 
 buttonFrame.grid(row=0, column=0, sticky='nsew')
 
