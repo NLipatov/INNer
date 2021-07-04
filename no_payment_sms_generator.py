@@ -11,21 +11,21 @@ def file_name_generator():
     return filename
 
 def gen_workbook_and_sheet():
-    global workbook, worksheet
+    global workbook, worksheet, bold_font, date_format
     workbook = xlsxwriter.Workbook(f'{file_name_generator()}')
     worksheet = workbook.add_worksheet()
     worksheet.ignore_errors({'number_stored_as_text': 'A1:R150'})
-# cell_format = workbook.add_format()
-# cell_format.set_num_format("0.0")
+    bold_font = workbook.add_format({'bold': True})
+    date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+
 
 def generate_row(airwaybillnum, telephonenum, consigneename):
     today = date.today()
-    dt = today.strftime( "%d.%m.%Y" )
     row = ['SVO', f'{int(airwaybillnum)}', f'{int(telephonenum)}', f'{consigneename}', \
             f'DHL информирует: в Ваш адрес ожидается прибытие груза по накладной № {airwaybillnum}. Просим предоставить данные для\
 таможенного декларирования, \
 пройдя по ссылке https://eshopping.dhl.ru/. Вопросы вы можете задать по e-mail: RUSVOB2C@dhl.ru.\
-Тему сообщения просьба указать {airwaybillnum}.', 'none', 'no', 'no', 1, 1, 'EUR', 0.2, 0, 0, str( dt ),\
+Тему сообщения просьба указать {airwaybillnum}.', 'none', 'no', 'no', 1, 1, 'EUR', 0.2, 0, 0, today,\
 2.0, 0.0, 0.0, ]
 
     return row
@@ -36,14 +36,16 @@ def create_sys_row():
     gen_workbook_and_sheet()
     row = 0
     for column, value in enumerate(tech_row):
-        worksheet.write(row, column, value)
+        worksheet.write(row, column, value, bold_font)
 
 
 def create_rowx(row_num, generated_row_text):
     for column, value in enumerate( generated_row_text ):
         worksheet.write( row_num, column, value)
-        # if column == 8:
-        #     worksheet.set_row(row_num, 15, cell_format )
+        if row_num == 0:
+            worksheet.write( row_num, column, value, bold_font )
+        if column == 14:
+            worksheet.write( row_num, column, value, date_format )
 
 def close_workbook(): #может использоваться как кнопка сформировать файл
     global workbook
@@ -65,9 +67,7 @@ tech_row = ['gtw', 'waybill', 'phone', 'consignee', 'sms_text', 'brkr_fee',\
 
 list = []
 lenlist = int(len(list))
-# list.append(['1337','79998143975', 'Gregory M. Bryant']) #добавление в лист листов значения с кнопки
-# list.append(['1338','79998143977', 'Pat Galsinger'])
-# list.append(['1340','79998143980', 'Lisa Su'])
+
 
 
 def row_gen(row_number, list_of_values):
