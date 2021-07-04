@@ -25,7 +25,7 @@ def GUI():
         LabelAWB.event_generate( '<Control-v>' )
     NPSMSGUI = tk.Tk()
     NPSMSGUI.title('Нет данных, есть оплата')
-    NPSMSGUI.geometry('320x150+700+300')
+    NPSMSGUI.geometry('320x120+700+300')
     Frame = tk.Frame(master=NPSMSGUI)
     LabelAWB = tk.Label(master=Frame, text='AWB:', width=14)
     EntryAWB = tk.Entry(master=Frame, width=50)
