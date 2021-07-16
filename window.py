@@ -1,27 +1,21 @@
 import tkinter as tk
-import os, time, inn, no_payment_sms_gui
+from tkinter import PhotoImage
+import os, time, inn, no_payment_sms_gui, AWBFGUI
 import urllib.request
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 
 def Response_Code_Meaning():
-    response = urllib.request.urlopen( "https://service.nalog.ru/inn.do" ).getcode()
+    response = ''
+    # response = urllib.request.urlopen( "https://service.nalog.ru/static/personal-data.html?svc=inn&from=%2Finn.do" ).getcode()
     if response == 200:
-        FNSStatus = 'Доступен'
+        FNSStatus = ' Доступен'
     elif response == 500:
-        FNSStatus = 'Недоступен'
+        FNSStatus = ' Недоступен'
     else:
-        FNSStatus = 'Необходимо проверить статус сайта ФНС вручную'
+        FNSStatus = ' Необходимо проверить статус сайта ФНС вручную'
     return FNSStatus
 
-
-def LogRead(label):
-    def read():
-        with open(r'C:\Users\Admin\Desktop\INNer\Log.txt') as Log:
-            lines = Log.read()
-            logContainer.configure(text=(str(lines)))
-        label.after(10, read)
-    read()
 
 
 helloraised = 0
@@ -42,8 +36,9 @@ def addtotext(arg):
     text.insert(tk.END, arg)
 
 def FileSelect():
-    filepath = askopenfilename( filetypes=[("Книга Excel", "*.xls")] )
+    filepath = askopenfilename( filetypes=[("Книга Excel", "*.xls")], title='Выберите файл' )
     if filepath == '':
+        print('No Filepath')
         pass
     else:
         print(f' Filepath = {filepath}')
@@ -52,11 +47,9 @@ def FileSelect():
         inn.DirWor(direction, workbook)
         inn.Start()
 
+
 def innlog():
     inn.ToLog()
-
-# CheckIfLogExists()
-
 
 
 window = tk.Tk()
@@ -64,9 +57,9 @@ window = tk.Tk()
 
 window.resizable(width=False, height=False)
 window.resizable(0, 0)
-window.title('INNer')
+window.title('INNer v1.2.0.1')
 try:
-    window.iconbitmap( "INNer.ico" )
+    window.iconbitmap(r"C:\INNer\INNERICC.ico")
 except:
     pass
 
@@ -78,16 +71,26 @@ Lead programmer: Lipatov Nikita""")
 window.rowconfigure([0],minsize=300, weight=1)
 window.columnconfigure([0, 1],minsize=10, weight=1)
 
+clear_icon = PhotoImage(file=r'C:\INNer\Clear.png')
+clear_icon_su = clear_icon.subsample(40,67)
+
 buttonFrame = tk.Frame(window, bd= 7, bg='grey')
-buttonOpen = tk.Button(buttonFrame, text='Открыть файл', command=FileSelect, width=20)
+AuthorsFrame = tk.Frame(window, bd= 7, bg='grey')
+buttonOpen = tk.Button(buttonFrame, text='Прогнать файл', command=FileSelect, width=20)
 ButtonSMS_nodata_payed = tk.Button(buttonFrame, text='SMS: нет данных, оплачено', command=no_payment_sms_gui.GUI, width=20)
-buttonAuthors = tk.Button(buttonFrame, text='Авторство', command=write_hello, width=20)
+ButtonAWBF = tk.Button(buttonFrame, text='Собрать а/н', command=AWBFGUI.Main, width=24)
+ButtonAWBF_clear = tk.Button(buttonFrame, text='Очистить буфер', image=clear_icon_su, command=AWBFGUI.Clear, width=13)
+buttonAuthors = tk.Button(AuthorsFrame, text='Автор', command=write_hello, width=20)
+
 
 buttonOpen.grid(row=0, column=0, ipadx=23, sticky='w')
-buttonAuthors.grid(row=2, column=0, ipadx=23, sticky='s')
 ButtonSMS_nodata_payed.grid(row=1, column=0, ipadx=23, sticky='w')
+ButtonAWBF.grid(row=2, column=0, sticky='w')
+ButtonAWBF_clear.grid(row=2, column=0, sticky='e')
+buttonAuthors.grid(row=3, column=0, ipadx=23, sticky='s')
 
 buttonFrame.grid(row=0, column=0, sticky='nsew')
+AuthorsFrame.grid(row=1, column=0, sticky='s')
 
 logFrame = tk.Frame(window)
 logLabel = tk.Label(master=logFrame, text='Статус-бар:', bg='#C0C0C0')
