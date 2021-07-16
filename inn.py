@@ -1,11 +1,3 @@
-# print("""
-# Source code can be found on my GitHub: github.com/NLipatov
-# This software is released under the MIT license
-#
-# ver: 1.1.1
-# """)
-
-
 import time, os, xlrd, xlwt, tkinter as tk
 from threading import Thread
 from selenium import webdriver
@@ -16,17 +8,13 @@ from xlutils.copy import copy
 
 direction = None
 workbookname = None
-
-
-
+status = ''
 
 def DirWor(Dir, Wor):
     global direction
     global workbookname
     direction = Dir
     workbookname = Wor
-    print(direction, workbookname)
-
 
 innermessage = 'Работа над файлом'
 message = ''
@@ -43,12 +31,15 @@ def Get_message():
 def TT():
     os.chdir( direction )
     def Draw():
-        global text
-        frame=tk.Frame(root,relief='solid',bd=1)
-        root.geometry('250x90+500+600')
+        global text, status
+        status = ''
+        frame=tk.Frame(root,relief='solid',bd=1, bg='grey')
+        root.geometry('500x90+500+600')
+        root.iconbitmap( r"C:\INNer\INNERICC.ico" )
+        root.iconbitmap( r"C:\INNer\INNERICC.ico" )
         root.title( 'Файл в работе' )
         try:
-            window.iconbitmap( "INNer.ico" )
+            window.iconbitmap(r"C:\INNer\INNERICC.ico")
         except:
             pass
         frame.pack()
@@ -59,32 +50,22 @@ def TT():
         global text
         text.configure(text=Get_message())
         root.after(1000, Refresher)
+        if status == 'Done':
+            root.title('Готово')
+            root.lift()
+            root.attributes( '-topmost', True )
+            root.after_idle( root.attributes, '-topmost', False )
+            # time.sleep(10)
+            # root.destroy()
 
     root=tk.Tk()
     Draw()
     Refresher()
     root.mainloop()
 
-#
-# def UI_ON():
-#     global TextFrame
-#     window = tk.Tk()
-#     window.title('Файл в работе')
-#     window.geometry('500x200+700+300')
-#     masterFrame = tk.Frame(window)
-#     TextFrame = tk.Label(master=masterFrame, text=f'{message}')
-#     masterFrame.pack()
-#     TextFrame.pack()
-#     TextFrame.configure( text=message )
-#     window.after( 60)
-#     window.mainloop()
-
-
-
-
 
 def Main():
-    global message
+    global message, status
     DriverPath = r'C:\INNer\chromedriver.exe'
 
 
@@ -142,8 +123,7 @@ def Main():
             message = message + str(infoNowWorkingOnClient)
             refreshedINN = 0
             if RFW != i:
-                Chk1 +=1 # Проставляю Чекван + 1, так как по какой-то причине RFW не равен i. \
-                # Программа не будет работать дальше
+                Chk1 +=1
                 while True:
                     print('Критическая ошибка: RFW != i!')
                     pass
@@ -217,8 +197,26 @@ def Main():
     EndingB = ('\nТемп равен %s секунд(-ы) на одного клиента' % (((TotalWorkingTimeEnd-TotalWorkingTimeStart)/sheet.nrows)))
     message = str(EndingA)
     message += str(EndingB)
+    status = 'Done'
+
+
+
 
 
 def Start():
-    Thread(target = Main).start()
-    Thread(target = TT).start()
+    MAin_thread = Thread(target = Main)
+    MAin_thread.start()
+    TT_thread = Thread(target = TT)
+    TT_thread.start()
+    # Destroyer_thread = Thread(target=Destroyer())
+    # Destroyer_thread.start()
+    # MAin_thread.join()
+    # TT_thread.join()
+
+
+
+
+
+
+
+
