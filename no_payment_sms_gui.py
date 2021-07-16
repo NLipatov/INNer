@@ -21,11 +21,26 @@ def GUI():
         no_payment_sms_generator.create_file()
         no_payment_sms_generator.file_name_generator()
 
-    def paste(self):
-        LabelAWB.event_generate( '<Control-v>' )
+    def _onKeyRelease(event):
+        ctrl = (event.state & 0x0004) != 0
+        if event.keycode == 88 and ctrl and event.keysym.lower() != "x":
+            event.widget.event_generate( "<<Cut>>" )
+
+        if event.keycode == 86 and ctrl and event.keysym.lower() != "v":
+            event.widget.event_generate( "<<Paste>>" )
+
+        if event.keycode == 67 and ctrl and event.keysym.lower() != "c":
+            event.widget.event_generate( "<<Copy>>" )
+
+
     NPSMSGUI = tk.Tk()
     NPSMSGUI.title('Нет данных, есть оплата')
     NPSMSGUI.geometry('320x120+700+300')
+    NPSMSGUI.bind_all( "<Key>", _onKeyRelease)
+    try:
+        NPSMSGUI.iconbitmap( r"C:\INNer\INNERICC.ico" )
+    except:
+        pass
     Frame = tk.Frame(master=NPSMSGUI)
     LabelAWB = tk.Label(master=Frame, text='AWB:', width=14)
     EntryAWB = tk.Entry(master=Frame, width=50)
