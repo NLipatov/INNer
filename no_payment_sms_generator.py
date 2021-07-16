@@ -4,6 +4,14 @@ from datetime import date, datetime
 workbook = None
 worksheet = None
 
+def cheking_saving_directory():
+    if os.path.exists(r'C:\Work') == True:
+        os.chdir(r'C:\Work')
+        pass
+    else:
+        os.mkdir( r'C:\Work' )
+        os.chdir( r'C:\Work' )
+
 
 def file_name_generator():
     now = datetime.now()
@@ -21,7 +29,7 @@ def gen_workbook_and_sheet():
 
 def generate_row(airwaybillnum, telephonenum, consigneename):
     today = date.today()
-    row = ['SVO', f'{int(airwaybillnum)}', f'{int(telephonenum)}', f'{consigneename}', \
+    row = ['SVO', f'{(airwaybillnum)}', f'{(telephonenum)}', f'{consigneename}', \
             f'DHL информирует: в Ваш адрес ожидается прибытие груза по накладной № {airwaybillnum}. Просим предоставить данные для\
 таможенного декларирования, \
 пройдя по ссылке https://eshopping.dhl.ru/. Вопросы вы можете задать по e-mail: RUSVOB2C@dhl.ru.\
@@ -47,14 +55,11 @@ def create_rowx(row_num, generated_row_text):
         if column == 14:
             worksheet.write( row_num, column, value, date_format )
 
-def close_workbook(): #может использоваться как кнопка сформировать файл
+def close_workbook():
+    cheking_saving_directory()
     global workbook
     workbook.close()
-    workbook = xlsxwriter.Workbook( f'{file_name_generator()}' )
-
-
-
-directory = os.chdir(r'C:\Users\Admin\Desktop\INNer project\SMS')
+    workbook = xlsxwriter.Workbook( f'C:\Work\{file_name_generator()}' )
 
 
 tech_row = ['gtw', 'waybill', 'phone', 'consignee', 'sms_text', 'brkr_fee',\
@@ -72,7 +77,7 @@ lenlist = int(len(list))
 
 def row_gen(row_number, list_of_values):
     for i in range(row_number+1, row_number+2):
-        create_rowx( i, generate_row( f'{int(list_of_values[0])}', f'{int(list_of_values[1])}', f'{list_of_values[2]}' ) )
+        create_rowx( i, generate_row( f'{(list_of_values[0])}', f'{(list_of_values[1])}', f'{list_of_values[2]}' ) )
 
 
 def create_file():
