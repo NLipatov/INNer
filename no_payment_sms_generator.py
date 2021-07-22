@@ -55,6 +55,12 @@ def create_rowx(row_num, generated_row_text):
         if column == 14:
             worksheet.write( row_num, column, value, date_format )
 
+def file_info():
+    file_was_generated_succesfully = os.path.isfile( f'C:\Work\{file_name_generator()}' )
+    file_name = f'C:\Work\{file_name_generator()}'
+    if file_was_generated_succesfully == True:
+        return f'Путь к файлу: {file_name}'
+
 def close_workbook():
     cheking_saving_directory()
     global workbook
