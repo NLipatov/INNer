@@ -1,70 +1,97 @@
-import tkinter as tk
-from tkinter import messagebox as mb
-import no_payment_sms_generator
-list_of_values = []
+import xlsxwriter, os
+from datetime import date, datetime
 
+workbook = None
+worksheet = None
 
-
-def GUI():
-    def data_from_entries_to_list_of_values():
-        temp_list = []
-        temp_list.append( EntryAWB.get() )
-        temp_list.append( EntryTEL.get() )
-        temp_list.append( EntryNAME.get() )
-        EntryAWB.delete( '0', tk.END )
-        EntryTEL.delete( '0', tk.END )
-        EntryNAME.delete( '0', tk.END )
-        no_payment_sms_generator.list.append( temp_list )
-    def quit():
-        NPSMSGUI.destroy()
-
-    def create_file():
-        no_payment_sms_generator.create_file()
-        no_payment_sms_generator.file_name_generator()
-        mb.showinfo(title='Готово', message=f'{no_payment_sms_generator.file_info()}' )
-        quit()
-
-    def _onKeyRelease(event):
-        ctrl = (event.state & 0x0004) != 0
-        if event.keycode == 88 and ctrl and event.keysym.lower() != "x":
-            event.widget.event_generate( "<<Cut>>" )
-
-        if event.keycode == 86 and ctrl and event.keysym.lower() != "v":
-            event.widget.event_generate( "<<Paste>>" )
-
-        if event.keycode == 67 and ctrl and event.keysym.lower() != "c":
-            event.widget.event_generate( "<<Copy>>" )
-
-
-    NPSMSGUI = tk.Tk()
-    NPSMSGUI.title('Нет данных, есть оплата')
-    NPSMSGUI.geometry('320x120+700+300')
-    NPSMSGUI.bind_all( "<Key>", _onKeyRelease)
-    try:
-        NPSMSGUI.iconbitmap( r"C:\INNer\INNERICC.ico" )
-    except:
+def cheking_saving_directory():
+    if os.path.exists(r'C:\Work') == True:
+        os.chdir(r'C:\Work')
         pass
-    Frame = tk.Frame(master=NPSMSGUI)
-    LabelAWB = tk.Label(master=Frame, text='AWB:', width=14)
-    EntryAWB = tk.Entry(master=Frame, width=50)
-    LabelTEL= tk.Label(master=Frame, text='Телефон:', width=14)
-    EntryTEL = tk.Entry(master=Frame, width=50)
-    LabelNAME = tk.Label(master=Frame, text='Имя клиента:', width=14)
-    EntryNAME = tk.Entry(master=Frame, width=50)
-    buttonNext = tk.Button(master=Frame, text='Сформировать строку', bg='white', width=20, command=data_from_entries_to_list_of_values)
-    buttonSave = tk.Button(master=Frame, text='Сформировать файл', bg='white', width=20, command=create_file)
-
-    Frame.grid()
-
-    LabelAWB.grid(row=0, column=0, sticky='w')
-    EntryAWB.grid(row=0, column=1)
-    LabelTEL.grid(row=1, column=0, sticky='w')
-    EntryTEL.grid(row=1, column=1)
-    LabelNAME.grid(row=2, column=0, sticky='w')
-    EntryNAME.grid(row=2, column=1)
-    buttonNext.grid(row=3, column=0)
-    buttonSave.grid(row=4, column=0)
+    else:
+        os.mkdir( r'C:\Work' )
+        os.chdir( r'C:\Work' )
 
 
+def file_name_generator():
+    now = datetime.now()
+    filename = now.strftime('SMSGEN_'+'%H%M (%S)'+'.xlsx')
+    return filename
 
-    NPSMSGUI.mainloop()
+def gen_workbook_and_sheet():
+    global workbook, worksheet, bold_font, date_format
+    workbook = xlsxwriter.Workbook(f'{file_name_generator()}')
+    worksheet = workbook.add_worksheet()
+    worksheet.ignore_errors({'number_stored_as_text': 'A1:R150'})
+    bold_font = workbook.add_format({'bold': True})
+    date_format = workbook.add_format({'num_format': 'dd/mm/yyyy'})
+
+
+def generate_row(airwaybillnum, telephonenum, consigneename):
+    today = date.today()
+    row = ['SVO', f'{(airwaybillnum)}', f'{(telephonenum)}', f'{consigneename}', \
+            f'DHL информирует: в Ваш адрес ожидается прибытие груза по накладной № {airwaybillnum}. Просим предоставить данные для\
+таможенного декларирования, \
+пройдя по ссылке https://eshopping.dhl.ru/. Вопросы вы можете задать по e-mail: RUSVOB2C@dhl.ru.\
+Тему сообщения просьба указать {airwaybillnum}.', 'none', 'no', 'no', 1, 1, 'EUR', 0.2, 0, 0, today,\
+2.0, 0.0, 0.0, ]
+
+    return row
+
+
+
+def create_sys_row():
+    gen_workbook_and_sheet()
+    row = 0
+    for column, value in enumerate(tech_row):
+        worksheet.write(row, column, value, bold_font)
+
+
+def create_rowx(row_num, generated_row_text):
+    for column, value in enumerate( generated_row_text ):
+        worksheet.write( row_num, column, value)
+        if row_num == 0:
+            worksheet.write( row_num, column, value, bold_font )
+        if column == 14:
+            worksheet.write( row_num, column, value, date_format )
+
+def file_info():
+    file_was_generated_succesfully = os.path.isfile( f'C:\Work\{file_name_generator()}' )
+    file_name = f'C:\Work\{file_name_generator()}'
+    if file_was_generated_succesfully == True:
+        return f'Путь к файлу: {file_name}'
+
+def close_workbook():
+    cheking_saving_directory()
+    global workbook
+    workbook.close()
+    workbook = xlsxwriter.Workbook( f'C:\Work\{file_name_generator()}' )
+
+
+tech_row = ['gtw', 'waybill', 'phone', 'consignee', 'sms_text', 'brkr_fee',\
+'brkr_agrmnt', 'psp_data', 'ddp', 'inv_val', 'inv_curr', 'vat', 'cstm_fee', 'dhl_fee', 'arrival', 'wgt',\
+'stor_min', 'stor_day']
+
+
+
+
+
+list = []
+lenlist = int(len(list))
+
+
+
+def row_gen(row_number, list_of_values):
+    for i in range(row_number+1, row_number+2):
+        create_rowx( i, generate_row( f'{(list_of_values[0])}', f'{(list_of_values[1])}', f'{list_of_values[2]}' ) )
+
+
+def create_file():
+    global list
+    create_sys_row()
+    for count, row in enumerate(list):
+        row_gen(count, row)
+    close_workbook()
+    list = []
+
+
