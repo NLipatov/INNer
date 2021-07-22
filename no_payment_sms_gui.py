@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox as mb
 import no_payment_sms_generator
 list_of_values = []
 
@@ -20,6 +21,8 @@ def GUI():
     def create_file():
         no_payment_sms_generator.create_file()
         no_payment_sms_generator.file_name_generator()
+        mb.showinfo(title='Готово', message=f'{no_payment_sms_generator.file_info()}' )
+        quit()
 
     def _onKeyRelease(event):
         ctrl = (event.state & 0x0004) != 0
