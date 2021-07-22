@@ -63,11 +63,7 @@ try:
 except:
     pass
 
-disclaimerFrame = tk.Frame()
-disclaimer = tk.Label(master=disclaimerFrame, text="""Source code can be found on my GitHub: github.com/NLipatov
-This software is released under the MIT license.
 
-Lead programmer: Lipatov Nikita""")
 window.rowconfigure([0],minsize=300, weight=1)
 window.columnconfigure([0, 1],minsize=10, weight=1)
 
