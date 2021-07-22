@@ -16,7 +16,7 @@ def Main():
     folder_selected = filedialog.askdirectory(title='Выберите папку')
     return_from_fetcher = AWBF.FetchAWB(folder_selected)
     if return_from_fetcher != 'ERR':
-        show_info = mb.showinfo ('Готово!', f'Список из {AWBF.result_info} а/н скопирован в буфер обмена.')
+        mb.showinfo ('Готово!', f'Список из {AWBF.result_info} а/н скопирован в буфер обмена.')
     else:
         pass
     window.destroy()
