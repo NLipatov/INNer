@@ -1,4 +1,5 @@
-import time, os, xlrd, xlwt, tkinter as tk
+import time, os, xlrd, xlwt, re, tkinter as tk
+from xlwt import easyxf
 from threading import Thread
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -108,6 +109,12 @@ def Main():
             message = str( f'\n\nКлиентов обработано: {TotalClientsNumberNowWorking}/{TotalClientsNumber}\n' )
             ST = time.time()
             RFW = i
+            translit_name = sheet.cell_value( i, 5 )
+            re_res = re.findall( r'^\w+', f'{translit_name}' )
+            if re_res[0].lower() in ['mister', 'mistress', 'mizz', 'miss','mr', 'mrs', 'miss', 'ms',  'dr']:
+                corrected_translit_name = translit_name.replace( f'{re_res[0]} ', '' )
+                wbsheet.write( i, 5, corrected_translit_name, easyxf( 'font: name Calibri, height 220;' ) )
+                wb.save( 'INNERED — ' + workbookname )
             nam = sheet.cell_value(i, 2)
             if nam == '':
                 message += str('\n\n\nBreak. File ends here — blank cell at clients name\n\n\n')
@@ -180,6 +187,7 @@ def Main():
                             if i == 9:
                                 print(f'Не нашёл элемент, содержащий ИНН.i - {i}, fam - {fam}')
                                 wbsheet.write( RFW, 17, '-' )
+                                wb.save( 'INNERED — ' + workbookname )
                                 TotalClientsNumberNowWorking += 1
             else:
                 print('Не пройдена проверка Chk1.')
@@ -197,7 +205,9 @@ def Main():
     EndingB = ('\nТемп равен %s секунд(-ы) на одного клиента' % (((TotalWorkingTimeEnd-TotalWorkingTimeStart)/sheet.nrows)))
     message = str(EndingA)
     message += str(EndingB)
+    workbook.release_resources()
     status = 'Done'
+
 
 
 
